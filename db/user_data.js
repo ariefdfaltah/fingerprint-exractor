@@ -4,6 +4,7 @@ var user_data = new Schema({
     origin: String,
     file_origin: String,
     file_excel: String,
+    data_conver_phase1: [],
     data_origin: [],
     created_at:  {type: Date, required: true}
 });

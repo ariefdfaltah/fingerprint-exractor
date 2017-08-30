@@ -3,6 +3,7 @@ var router = express.Router();
 var fs = require('fs');
 var millisec = require('millisec');
 var json2xls = require('json2xls');
+var mongoose = require('mongoose');
 var user_dataDB = require('../db/user_data');
 
 var app = express();
@@ -88,45 +89,54 @@ router.get('/', function(req, res) {
                           a.errorTag = new Date(item.data[0].date);
                           return a;
                       } else if(item.data.length == 2) {
-                          var dateData = item.data[0].date.getHours();
-                          if(dateData < 15){
-                              var nDateData = new Date(item.data[0].date.setHours(15));
-                              var newDateData = new Date(nDateData.setMinutes(0));
+                          var dateData = item.data[0].date.getUTCHours();
+                          if(dateData < 8){
+                              var oriDateData = new Date(item.data[0].date);
+                              var nDateData = new Date(item.data[0].date.setUTCHours(8));
+                              var newDateData = new Date(nDateData.setUTCMinutes(0));
                           } else {
-                              var newDateData = item.data[0].date
+                              var oriDateData = new Date(item.data[0].date);
+                              var newDateData = item.data[0].date;
                           }
                           var a = {};
+                          a._id = mongoose.Types.ObjectId();
                           a.date = item._id.date.year + '-' + item._id.date.month + '-' + item._id.date.day;
                           a.name = item._id.name;
                           a.duration = millisec(item.data[1].date - newDateData).format('hh : mm : ss');
                           // var tag = new Date(item.data[0].dateData);
-                          a.inTag = item.data[0].date;
+                          a.inTag = oriDateData.toGMTString();
                           a.inTagUTC = item.data[0].date.getUTCHours();
-                          a.outTag = item.data[1].date;
+                          a.outTag = item.data[1].date.toGMTString();
                           a.errorTag = '-';
                           return a;
                       } else if(item.data.length > 2) {
+                          var b = item.data.map(function(item,i) {
+                            var c = {};
+                            return c[item] = item.date.toGMTString();
+                          });
                           var a = {};
+                          a._id = mongoose.Types.ObjectId();
                           a.date = item._id.date.year + '-' + item._id.date.month + '-' + item._id.date.day;
                           a.name = item._id.name;
                           a.duration = '-';
                           a.inTag = '-';
                           a.outTag = '-';
-                          a.errorTag = item.data;
+                          a.errorTag = b;
                           return a;
                       } else {
                           var a = {};
+                          a._id = mongoose.Types.ObjectId();
                           a.date = 'error';
                           a.name = 'error';
                           a.duration = 'error';
                           a.inTag = 'error';
                           a.outTag = 'error';
                           a.errorTag = 'error';
-                          return a;
+                          // return a;
                       }
                     });
-                    // res.xls('data.xlsx', aMap);
-                    res.json(aMap)
+                    // res.json(aMap);
+                    res.xls('data.xlsx', aMap);
                 }
             })
         }

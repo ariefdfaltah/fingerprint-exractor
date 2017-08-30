@@ -17,6 +17,8 @@ var users = require('./routes/users');
 var app = express();
 
 var user_dataDB = require('./db/user_data');
+
+// export to mongodb
 // var fp = path.join(__dirname, '001_Glog.txt');
 // fs.readFile(fp, function(err, f){
 //     var array = f.toString().split('\n');
@@ -66,6 +68,8 @@ var user_dataDB = require('./db/user_data');
 //         console.log('success')
 //     }
 // });
+// end export
+
 // user_dataDB.find().exec(find);
 // function find(err, data) {
 //     if(err){
